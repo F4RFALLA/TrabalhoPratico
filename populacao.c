@@ -1,6 +1,7 @@
 // populacao.c
 #include "populacao.h"
 #include "individuo.h"
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -42,14 +43,10 @@ Posicao simular_movimentos(const Labirinto* lab, Individuo* indiv, int* colisoes
         }
         
         // Verificar movimento válido
-        if(proxima.i < lab->n && proxima.j < lab->m && 
-           proxima.i >= 0 && proxima.j >= 0 && 
-           lab->labirinto[proxima.i][proxima.j] != '#') {
+        if(proxima.i < lab->n && proxima.j < lab->m && proxima.i >= 0 && proxima.j >= 0 && lab->labirinto[proxima.i][proxima.j] != '#') {
             atual = proxima;
-            
             // Se lab_copia foi fornecido, marcar posição
-            if(lab_copia && lab_copia[atual.i][atual.j] != 'S' && 
-               lab_copia[atual.i][atual.j] != 'E') {
+            if(lab_copia && lab_copia[atual.i][atual.j] != 'S' && lab_copia[atual.i][atual.j] != 'E') {
                 lab_copia[atual.i][atual.j] = '@';
             }
         } else {
@@ -61,12 +58,12 @@ Posicao simular_movimentos(const Labirinto* lab, Individuo* indiv, int* colisoes
     return atual;
 }
 
-char movimento_aleatorio() {
+char gerar_movimento_aleatorio() {
     char movimentos[] = {'C', 'B', 'E', 'D'};
     return movimentos[rand() % 4];
 }
 
-char movimento_valido_aleatorio(Labirinto* lab, Posicao atual) {
+char movimento_valido(Labirinto* lab, Posicao atual) {
     char movimentos[] = {'C', 'B', 'E', 'D'};
     char movimentos_validos[4];
     int num_validos = 0;
@@ -80,29 +77,25 @@ char movimento_valido_aleatorio(Labirinto* lab, Posicao atual) {
             case 'D': prox.j++; break;
         }
         
-        if(prox.i < lab->n && prox.j < lab->m && 
-           prox.i >= 0 && prox.j >= 0 && 
-           lab->labirinto[prox.i][prox.j] != '#') {
+        if(prox.i < lab->n && prox.j < lab->m && prox.i >= 0 && prox.j >= 0 && lab->labirinto[prox.i][prox.j] != '#') {
             movimentos_validos[num_validos++] = movimentos[i];
         }
     }
-    
+    //caso não tiver opções de caminhos válidos retorna um caminho aleatório:
     return (num_validos > 0) ? 
         movimentos_validos[rand() % num_validos] : 
-        movimento_aleatorio();
+        gerar_movimento_aleatorio();
 }
 
 int calcular_distancia_manhattan(Posicao a, Posicao b) {
     return abs((int)a.i - (int)b.i) + abs((int)a.j - (int)b.j);
 }
 
-void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
+void calcular_fitness(const Labirinto* lab, Individuo* indiv, int w_distancia) {
     if(!lab || !indiv || !indiv->caminho) {
         if(indiv) indiv->fitness = 0;
         return;
     }
-
-    int w_distancia = 1000;
     
     int colisoes = 0;
     // Chamada única para simular movimentos
@@ -113,8 +106,7 @@ void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
     indiv->fitness = (fitness > 0) ? fitness : 0;
 }
 
-// populacao.c (função modificada)
-TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
+TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao, FormaCaminho tipo, int distancia) {
     if(!lab) return NULL;
     int dist = calcular_distancia_manhattan(lab->inicio, lab->saida);
     TLinkedList* populacao = list_create();
@@ -132,22 +124,42 @@ TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
         }
 
         // Gera primeiro movimento válido
-        char mov_inicial = movimento_valido_aleatorio(lab, lab->inicio);
+        char mov_inicial = movimento_valido(lab, lab->inicio);
         Stack_push(ind.caminho, mov_inicial);
         
+        
         // Gera movimentos subsequentes (podem ser aleatórios, inclusive inválidos)
-        for(int j = 1; j < ind.tamanho_caminho; j++) {
-            char mov = movimento_aleatorio();
+        if (tipo == ALEATORIO){
+            for(int j = 1; j < ind.tamanho_caminho; j++) {
+            char mov = gerar_movimento_aleatorio();
             Stack_push(ind.caminho, mov);
+            }
+
+            calcular_fitness(lab, &ind, distancia);
+
+            if(!list_insert_end(populacao, ind)) {
+                free(ind.caminho);
+                free(populacao);
+                return NULL;
+            }
         }
 
-        calcular_fitness(lab, &ind);
+        if (tipo == MOV_VALIDOS){
+            for(int j = 1; j < ind.tamanho_caminho; j++) {
+            char mov = movimento_valido(lab, lab->inicio);
+            Stack_push(ind.caminho, mov);
+            }
 
-        if(!list_insert_end(populacao, ind)) {
-            free(ind.caminho);
-            free(populacao);
-            return NULL;
+            calcular_fitness(lab, &ind, distancia);
+
+            if(!list_insert_end(populacao, ind)) {
+                free(ind.caminho);
+                free(populacao);
+                return NULL;
+            }
         }
+        
+        
     }
     return populacao;
 }

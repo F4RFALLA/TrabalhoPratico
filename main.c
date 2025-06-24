@@ -34,10 +34,9 @@ int main() {
     }
     fclose(file);
 
-     Config config = ler_config("config.yaml");
+    Config config = ler_config("config.yaml");
 
     // 2. Criação do contexto do labirinto
-    int penalidade = 20;
     Labirinto* lab = criar_contexto(labirinto, n, m, config.penalidade);
     if (!lab) {
         fprintf(stderr, "Erro: Falha ao criar contexto do labirinto\n");
@@ -48,13 +47,8 @@ int main() {
     // 3. Exibição do labirinto
     labirinto_print(lab);
 
-    uint tamanho_populacao;
-    printf("Quantos individuos deseja que tenha na primeira populacao? ");
-    scanf("%u", &tamanho_populacao);
-    getchar();
-
     // 4. Criação da população
-    TLinkedList* populacao = criar_populacao(lab, config.tamanho_populacao, config.forma_caminho); //arrumar o .h
+    TLinkedList* populacao = criar_populacao(lab, config.tamanho_populacao, config.forma_caminho, config.w_distancia); 
     if (!populacao) {
         fprintf(stderr, "Erro: Falha ao criar populacao\n");
         liberar_matriz(labirinto, n);

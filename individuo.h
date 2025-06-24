@@ -13,7 +13,7 @@ typedef struct _individuo Individuo;
  * Por exemplo, pode retornar 'C' (Cima), 'B' (Baixo), etc.
  * @return char movimento aleatório ('C', 'B', 'E' ou 'D')
  */
-char movimento_aleatorio();
+char gerar_movimento_aleatorio();
 /**
  * Gera movimento válido 
  * Exemplo: EX: no start tem parede em cima e na esquerda, as opções de movimento são só baixo e direita
@@ -35,7 +35,7 @@ Posicao simular_movimentos(const Labirinto*, Individuo*, int*, char**);
  * @param Labirinto* Ponteiro para o contexto do labirinto
  * @param Individuo* Ponteiro para o indivíduo a ser avaliado
  */
-void calcular_fitness(const Labirinto*, Individuo*);
+void calcular_fitness(const Labirinto*, Individuo*, int);
 
 
 #endif

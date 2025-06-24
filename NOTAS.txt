@@ -1,0 +1,3 @@
+arrumar fitness
+colocar para printar o tipo de mov escolhido 
+printar as letras do caminho

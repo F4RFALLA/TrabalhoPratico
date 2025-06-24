@@ -11,10 +11,12 @@
  * Por exemplo, gera uma população com tamanho baseado na distância de Manhattan.
  * @param Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
  * @param uint - tamanho da população dado pelo usuário
+ * @param FormaCaminho - tipo de movimento: aleatório ou somente válido
+ * @param int - valor da penalidade da distancia
  * @return TLinkedList* - lista encadeada contendo a população ou NULL em caso de erro
  * @see calcular_distancia_manhattan(), TSList_create(), list_create()
  */
-TLinkedList* criar_populacao(Labirinto*, uint, FormaCaminho);
+TLinkedList* criar_populacao(Labirinto*, uint, FormaCaminho, int);
 
 /**
  * Libera toda a memória alocada para uma população.
