@@ -17,8 +17,7 @@ char** copiar_matriz(char** original, uint n, uint m) {
     }
     return copia;
 }
-//separar aqui a geração de movimento aleatório e a de movimentos válidos, o de movimento aleatório, so o primeiro movimente será somente para a direira ou para baixo
-//que é o caso desse labirinto, a o movimentos válidos não terá penalidade por colisão pois ele considera o movimento que vai bater na parede
+
 Posicao simular_movimentos(const Labirinto* lab, Individuo* indiv, int* colisoes, char** lab_copia) {
     if(!lab || !indiv || !indiv->caminho) return lab->inicio;
     
