@@ -63,13 +63,14 @@ char gerar_movimento_aleatorio() {
     return movimentos[rand() % 4];
 }
 
-char movimento_valido(Labirinto* lab, Posicao atual) {
+// populacao.c
+char movimento_valido(Labirinto* lab, Posicao* atual) {  // Recebe ponteiro para Posicao
     char movimentos[] = {'C', 'B', 'E', 'D'};
     char movimentos_validos[4];
     int num_validos = 0;
     
     for(int i = 0; i < 4; i++) {
-        Posicao prox = atual;
+        Posicao prox = *atual;  // Cópia da posição atual
         switch(movimentos[i]) {
             case 'C': prox.i--; break;
             case 'B': prox.i++; break;
@@ -81,10 +82,24 @@ char movimento_valido(Labirinto* lab, Posicao atual) {
             movimentos_validos[num_validos++] = movimentos[i];
         }
     }
-    //caso não tiver opções de caminhos válidos retorna um caminho aleatório:
-    return (num_validos > 0) ? 
-        movimentos_validos[rand() % num_validos] : 
-        gerar_movimento_aleatorio();
+    
+    char movimento_escolhido;
+    if (num_validos > 0) {
+        movimento_escolhido = movimentos_validos[rand() % num_validos];
+    } else {
+        printf("não existem movimentos validos, gerando movimentos aleatórios");
+        movimento_escolhido = gerar_movimento_aleatorio();
+    }
+    
+    // Atualiza a posição atual com o movimento escolhido
+    switch(movimento_escolhido) {
+        case 'C': atual->i--; break;
+        case 'B': atual->i++; break;
+        case 'E': atual->j--; break;
+        case 'D': atual->j++; break;
+    }
+    
+    return movimento_escolhido;
 }
 
 int calcular_distancia_manhattan(Posicao a, Posicao b) {
@@ -122,13 +137,9 @@ TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao, FormaCaminh
             free(populacao);
             return NULL;
         }
-
-        // Gera primeiro movimento válido
-        char mov_inicial = movimento_valido(lab, lab->inicio);
-        Stack_push(ind.caminho, mov_inicial);
         
         
-        // Gera movimentos subsequentes (podem ser aleatórios, inclusive inválidos)
+        // Gera movimentos dependendo do tipo que esta no arquivo config
         if (tipo == ALEATORIO){
             for(int j = 1; j < ind.tamanho_caminho; j++) {
             char mov = gerar_movimento_aleatorio();
@@ -137,7 +148,7 @@ TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao, FormaCaminh
 
             calcular_fitness(lab, &ind, distancia);
 
-            if(!list_insert_end(populacao, ind)) {
+            if(!list_insert_sorted(populacao, ind)) {
                 free(ind.caminho);
                 free(populacao);
                 return NULL;
@@ -145,14 +156,16 @@ TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao, FormaCaminh
         }
 
         if (tipo == MOV_VALIDOS){
+            Posicao atual = lab->inicio;
+
             for(int j = 1; j < ind.tamanho_caminho; j++) {
-            char mov = movimento_valido(lab, lab->inicio);
+            char mov = movimento_valido(lab, &atual);
             Stack_push(ind.caminho, mov);
             }
 
             calcular_fitness(lab, &ind, distancia);
 
-            if(!list_insert_end(populacao, ind)) {
+            if(!list_insert_sorted(populacao, ind)) {
                 free(ind.caminho);
                 free(populacao);
                 return NULL;

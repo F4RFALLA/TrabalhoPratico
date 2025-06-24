@@ -55,6 +55,15 @@ bool list_insert_begin(TLinkedList*, Individuo);
 bool list_insert_end(TLinkedList*, Individuo);
 
 /**
+ * Insere um elemento em ordem decrescente na lista.
+ * Por exemplo, inserindo 1, 2, 3 resulta em [3] -> [2] -> [1].
+ * @param TLinkedList* ponteiro para a lista
+ * @param Individuo informação a ser armazenada
+ * @return bool true se a inserção foi bem-sucedida
+ */
+bool list_insert_sorted(TLinkedList*, Individuo);
+
+/**
  * Imprime todos os elementos da lista no console.
  * Por exemplo, imprime [1] -> [2] -> [3] para a lista acima.
  * @param TLinkedList* ponteiro para a lista

@@ -11,6 +11,29 @@ TLinkedList* list_create() {
     return nova;
 }
 
+// List.c
+bool list_insert_sorted(TLinkedList* lista, Individuo info) {
+    TNo* novo = TNo_createNFill(info);
+    if (!novo) return false;
+    
+    // Caso especial: lista vazia ou novo fitness maior que o primeiro
+    if (lista->inicio == NULL || novo->info.fitness > lista->inicio->info.fitness) {
+        novo->prox = lista->inicio;
+        lista->inicio = novo;
+        return true;
+    }
+
+    // Percorrer lista para encontrar posição correta
+    TNo* atual = lista->inicio;
+    while (atual->prox != NULL && atual->prox->info.fitness >= novo->info.fitness) {
+        atual = atual->prox;
+    }
+    
+    novo->prox = atual->prox;
+    atual->prox = novo;
+    return true;
+}
+
 bool list_insert_begin(TLinkedList* lista, Individuo info){
     TNo* novo = TNo_createNFill(info);
     if(novo == NULL) return false;
