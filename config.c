@@ -1,4 +1,3 @@
-// config.c
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,8 +18,13 @@ Config ler_config(const char* filename) {
 
         int int_value;
         float float_value;
+         char str_value[20];  // Buffer para valores de string
+
+         /*
+         sobre buffer: Extrair a palavra aleatorio -> Convertê-la para o valor da enumeração ALEATORIO
+         O buffer nos permite armazenar essa string temporariamente para depois compará-la.
+         */
         
-        //A função sscanf() lê dados formatados de uma string. Ela retorna o número de itens que foram atribuídos com sucesso.
         if (sscanf(line, "tamanho_populacao: %d", &int_value) == 1) {
             cfg.tamanho_populacao = int_value;
         } else if (sscanf(line, "prob_cx: %f", &float_value) == 1) {
@@ -33,11 +37,14 @@ Config ler_config(const char* filename) {
             cfg.penalidade = int_value;
         } else if (sscanf(line, "max_gen: %d", &int_value) == 1) {
             cfg.max_gen = int_value;
-        } else if (strstr(line, "forma_caminho:")) {
-            if (strstr(line, "mov_validos")) {
+        } else if (sscanf(line, "forma_caminho: %19s", str_value) == 1) {
+            if (strcmp(str_value, "mov_validos") == 0) {
                 cfg.forma_caminho = MOV_VALIDOS;
-            } else if (strstr(line, "aleatorio")) {
+            } else if (strcmp(str_value, "aleatorio") == 0) {
                 cfg.forma_caminho = ALEATORIO;
+            } else {
+                // Valor padrão caso seja desconhecido
+                cfg.forma_caminho = MOV_VALIDOS;
             }
         }
     }

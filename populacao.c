@@ -108,7 +108,15 @@ Individuo criar_individuo(Labirinto *lab, FormaCaminho tipo, int distancia) {
   ind.caminho = Stack_create(ind.tamanho_caminho);
   ind.fitness = 0;
 
+  /*
   if (!ind.caminho) return ind;
+
+    if (tipo == MOV_VALIDOS) {
+      printf("DEBUG: Individuo sendo criado com MOVIMENTOS VALIDOS.\n");
+  } else if (tipo == ALEATORIO) {
+      printf("DEBUG: Individuo sendo criado com MOVIMENTOS ALEATORIOS PUROS.\n");
+  }
+  */
 
   if (tipo == MOV_VALIDOS) {
     // Modo MOV_VALIDOS (mantido)
@@ -126,9 +134,7 @@ Individuo criar_individuo(Labirinto *lab, FormaCaminho tipo, int distancia) {
     }
   } else {// Modo ALEATORIO: gera movimentos aleatórios
       for (int j = 0; j < ind.tamanho_caminho; j++) {
-        char movimentos[4] = {'C', 'B', 'E', 'D'};
-        char aleat = movimentos[rand() % 4];
-        Stack_push(ind.caminho, aleat);
+        Stack_push(ind.caminho, gerar_movimento_aleatorio());
       }
     }
     
@@ -275,8 +281,15 @@ TLinkedList* crossover(TLinkedList* elite, TLinkedList* populacao1, Labirinto* l
     list_insert_end(nao_elite, atual->info);
   }
 
-  // Realizar cruzamentos
-  for (TNo* atual_elite = elite->inicio; atual_elite != NULL && nao_elite->inicio != NULL; atual_elite = atual_elite->prox) {
+  // CORREÇÃO: Calcular tamanho desejado
+  int tamanho_desejado = list_size(populacao1);
+  int filhos_necessarios = tamanho_desejado - list_size(elite);
+
+  // Realizar cruzamentos controlados
+  for (TNo* atual_elite = elite->inicio; 
+       atual_elite != NULL && nao_elite->inicio != NULL && filhos_necessarios > 0; 
+       atual_elite = atual_elite->prox) 
+  {
     int idx_pai = selecionar_pai(nao_elite);
     TNo* pai_nao_elite = nao_elite->inicio;
     for (int i = 0; i < idx_pai && pai_nao_elite != NULL; i++, pai_nao_elite = pai_nao_elite->prox);
@@ -285,10 +298,20 @@ TLinkedList* crossover(TLinkedList* elite, TLinkedList* populacao1, Labirinto* l
     Individuo filho1, filho2;
     crossover_inds(&atual_elite->info, &pai_nao_elite->info, &filho1, &filho2);
 
+    // CORREÇÃO: Inserir apenas até completar tamanho
     calcular_fitness(lab, &filho1, w_distancia);
-    calcular_fitness(lab, &filho2, w_distancia);
     list_insert_sorted(nova_geracao, filho1);
-    list_insert_sorted(nova_geracao, filho2);
+    filhos_necessarios--;
+
+    if (filhos_necessarios > 0) {
+      calcular_fitness(lab, &filho2, w_distancia);
+      list_insert_sorted(nova_geracao, filho2);
+      filhos_necessarios--;
+    } else {
+      // Liberar filho excedente
+      free(filho2.caminho->data);
+      free(filho2.caminho);
+    }
   }
 
   list_destroy(nao_elite, 0);

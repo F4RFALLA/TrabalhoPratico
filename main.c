@@ -5,6 +5,45 @@
 #include <stdlib.h>
 #include <time.h>
 
+void salvar_populacao_csv(TLinkedList *populacao, int geracao, const char *filename) {
+    // Modo: 'w' na primeira geração, 'a' nas demais
+    FILE *csv = (geracao == 0) ? fopen(filename, "w") : fopen(filename, "a");
+    
+    if (!csv) {
+        fprintf(stderr, "Erro ao abrir arquivo CSV\n");
+        return;
+    }
+
+    // Escreve cabeçalho apenas na primeira geração
+    if (geracao == 0) {
+        fprintf(csv, "Geracao,Indice,Fitness,Caminho\n");
+    }
+
+    int indice = 0;
+    for (TNo *atual = populacao->inicio; atual != NULL; atual = atual->prox, indice++) {
+        // Converter caminho para string com aspas
+        char* caminho_str = (char*)malloc(atual->info.caminho->qty + 3);  // +3 para aspas e \0
+        caminho_str[0] = '"';
+        
+        for (int i = 0; i < atual->info.caminho->qty; i++) {
+            caminho_str[i+1] = atual->info.caminho->data[i];
+        }
+        
+        caminho_str[atual->info.caminho->qty + 1] = '"';
+        caminho_str[atual->info.caminho->qty + 2] = '\0';
+
+        fprintf(csv, "%d,%d,%d,%s\n", 
+                geracao,  // Usa o número real da geração
+                indice,
+                atual->info.fitness,
+                caminho_str);
+
+        free(caminho_str);
+    }
+
+    fclose(csv);
+}
+
 int main() {
     srand(time(NULL));
 
@@ -114,6 +153,8 @@ int main() {
         printf("Melhor fitness: %d\n", populacao->inicio->info.fitness);
         printf("Media de fitness: %.2f\n", (float)somar_fitness(populacao) / config.tamanho_populacao);
         
+        salvar_populacao_csv(populacao, geracao, "evolucao.csv");
+
         geracao++;
     }
 
