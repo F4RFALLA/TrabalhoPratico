@@ -1,4 +1,0 @@
-arrumar fitness - feito
-colocar para printar o tipo de mov escolhido 
-printar as letras do caminho - feito
-colocar lista para ordenar do maior fitness para o menor (para ficar mais fácil de fazer o elitismo, que é pegar os melhores indivíduos de uma populção e passar para a próxima) - feito

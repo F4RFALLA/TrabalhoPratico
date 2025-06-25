@@ -320,8 +320,8 @@ TLinkedList* crossover(TLinkedList* elite, TLinkedList* populacao1, Labirinto* l
   return nova_geracao;
 }
 
-int condicao_parada(const Labirinto *lab, TLinkedList *populacao) {
-  if (!lab || !populacao) return 0;
+Individuo* condicao_parada(const Labirinto *lab, TLinkedList *populacao) {
+  if (!lab || !populacao) return NULL;
 
   for (TNo *atual = populacao->inicio; atual != NULL; atual = atual->prox) {
     int colisoes = 0;
@@ -330,10 +330,10 @@ int condicao_parada(const Labirinto *lab, TLinkedList *populacao) {
       printf("\n--- SOLUCAO ENCONTRADA ---\n");
       printf("Individuo com fitness %d atingiu a saida (%u, %u)\n", 
       atual->info.fitness, final.i, final.j);
-      return 1;
+      return &atual->info; // Retorna o indivíduo que resolveu
     }
   }
-  return 0;
+  return NULL;
 }
 
 void imprimir_individuo(Labirinto* lab, Individuo* indiv, int geracao, int w_distancia) {

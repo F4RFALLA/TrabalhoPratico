@@ -62,16 +62,15 @@ int main() {
 
     // 6. Loop principal do algoritmo genético
     int geracao = 0;
-    int encontrou_solucao = 0;
+    Individuo* solucao_encontrada = NULL;
 
     printf("\n=== Iniciando Algoritmo Genetico ===\n");
     printf("Tamanho da Populacao: %d\n", config.tamanho_populacao);
     printf("Probabilidade de Crossover: %.2f\n", config.prob_cx);
-    printf("Probabilidade de Mutacao: %.2f\n", config.prob_mut);
     printf("Taxa de Elitismo: %.2f\n", config.elitismo);
     printf("Maximo de Geracoes: %d\n\n", config.max_gen);
-
-    while (geracao < config.max_gen && !encontrou_solucao) {
+    
+    while (geracao < config.max_gen && solucao_encontrada == NULL) {
         printf("\n=== Geracao %d ===\n", geracao + 1);
         
         // 6.1 Selecionar elite
@@ -110,30 +109,23 @@ int main() {
         populacao = nova_geracao;
         
         // 6.8 Verificar condição de parada
-        encontrou_solucao = condicao_parada(lab, populacao);
+       solucao_encontrada = condicao_parada(lab, populacao);
         
         // 6.9 Exibir estatísticas
         printf("Melhor fitness: %d\n", populacao->inicio->info.fitness);
         printf("Media de fitness: %.2f\n", (float)somar_fitness(populacao) / config.tamanho_populacao);
         
         geracao++;
-    }
 
-    // 7. Exibir resultado final
-    if (encontrou_solucao) {
-        printf("\n=== SOLUCAO ENCONTRADA NA GERACAO %d! ===\n", geracao);
-        
-        // Exibir o melhor indivíduo
-        if (populacao->inicio) {
-            Individuo* solucao = &populacao->inicio->info;
+        if (solucao_encontrada) {
             printf("\nMelhor solucao encontrada:\n");
-            printf("Fitness: %d\n", solucao->fitness);
-            printf("Tamanho do caminho: %d\n", solucao->tamanho_caminho);
+            printf("Fitness: %d\n", solucao_encontrada->fitness);
+            printf("Tamanho do caminho: %d\n", solucao_encontrada->tamanho_caminho);
             
             // Mostrar caminho percorrido
             char** lab_copia = copiar_matriz(lab->labirinto, lab->n, lab->m);
             int colisoes = 0;
-            simular_movimentos(lab, solucao, &colisoes, lab_copia);
+            simular_movimentos(lab, solucao_encontrada, &colisoes, lab_copia);
             
             printf("\nLabirinto com solucao:\n");
             for (uint i = 0; i < lab->n; i++) {
@@ -147,10 +139,10 @@ int main() {
             for (uint i = 0; i < lab->n; i++) free(lab_copia[i]);
             free(lab_copia);
         }
-    } else {
-        printf("\nNao foi encontrada solucao apos %d geracoes\n", geracao);
+        else {
+            printf("\nNao foi encontrada solucao apos %d geracoes\n", geracao);
+        }
     }
-
     // 8. Liberação de recursos
     list_destroy(populacao, 1);
     liberar_matriz(labirinto, n);

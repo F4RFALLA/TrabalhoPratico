@@ -23,8 +23,6 @@ Config ler_config(const char* filename) {
         //A função sscanf() lê dados formatados de uma string. Ela retorna o número de itens que foram atribuídos com sucesso.
         if (sscanf(line, "tamanho_populacao: %d", &int_value) == 1) {
             cfg.tamanho_populacao = int_value;
-        } else if (sscanf(line, "prob_mut: %f", &float_value) == 1) {
-            cfg.prob_mut = float_value;
         } else if (sscanf(line, "prob_cx: %f", &float_value) == 1) {
             cfg.prob_cx = float_value;
         } else if (sscanf(line, "elitismo: %f", &float_value) == 1) {

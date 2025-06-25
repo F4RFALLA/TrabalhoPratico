@@ -85,9 +85,9 @@ TLinkedList* crossover(TLinkedList*, TLinkedList*, Labirinto*, int);
  * Verifica condição de parada (chegada na saída).
  * @param const Labirinto* ponteiro para labirinto
  * @param TLinkedList* lista da população
- * @return int 1 se condição satisfeita, 0 caso contrário
+ * @return Individuo* ponteiro para o indivíduo que chegou na saída, ou NULL se nenhum.
  */
-int condicao_parada(const Labirinto*, TLinkedList*);
+Individuo* condicao_parada(const Labirinto*, TLinkedList*);
 
 /**
  * Imprime detalhes de um indivíduo.

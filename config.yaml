@@ -1,10 +1,9 @@
 # Configurações do Algoritmo Genético para resolver labirinto
 
 tamanho_populacao: 20        # Número de indivíduos na população
-prob_mut: 0.5        # Probabilidade de mutação (entre 0 e 1)
 prob_cx: 0.95        # Probabilidade de crossover (entre 0 e 1)
 elitismo: 0.5        # Taxa de elitismo (porcentagem de indivíduos que sobrevivem sem alteração)
-forma_caminho: mov_validos # Forma de geração do caminho: [mov_validos, aleatorio]
+forma_caminho: aleatorio # Forma de geração do caminho: [mov_validos, aleatorio]
 w_distancia: 1000     # Peso da distância no cálculo do fitness
 penalidade: 100     # Peso de colisões com obstáculos no fitness
 max_gen: 10       # Número máximo de gerações
