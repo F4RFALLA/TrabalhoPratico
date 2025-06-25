@@ -94,8 +94,7 @@ Individuo* condicao_parada(const Labirinto*, TLinkedList*);
  * @param Labirinto* ponteiro para labirinto
  * @param Individuo* ponteiro para indivíduo
  * @param int geração atual
- * @param int peso da distância
  */
-void imprimir_individuo(Labirinto*, Individuo*, int, int);
+void imprimir_individuo(const Labirinto*, Individuo*, int);
 
 #endif

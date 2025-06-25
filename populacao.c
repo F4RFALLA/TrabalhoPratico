@@ -49,7 +49,7 @@ Posicao simular_movimentos(const Labirinto *lab, Individuo *indiv, int *colisoes
 }
 
 char gerar_movimento_aleatorio() {
-  char movimentos[] = {'C', 'B', 'E', 'D'};
+  char movimentos[4] = {'C', 'B', 'E', 'D'};
   return movimentos[rand() % 4];
 }
 
@@ -98,8 +98,11 @@ void calcular_fitness(const Labirinto *lab, Individuo *indiv, int w_distancia) {
 }
 
 // Função unificada para criação de indivíduo
+// Corrigir a função criar_individuo
 Individuo criar_individuo(Labirinto *lab, FormaCaminho tipo, int distancia) {
   Individuo ind;
+    
+  // Define o tamanho do caminho baseado na distância Manhattan
   int dist = calcular_distancia_manhattan(lab->inicio, lab->saida);
   ind.tamanho_caminho = dist + (rand() % (dist + 1));
   ind.caminho = Stack_create(ind.tamanho_caminho);
@@ -108,28 +111,30 @@ Individuo criar_individuo(Labirinto *lab, FormaCaminho tipo, int distancia) {
   if (!ind.caminho) return ind;
 
   if (tipo == MOV_VALIDOS) {
+    // Modo MOV_VALIDOS (mantido)
     Posicao atual = lab->inicio;
     for (int j = 0; j < ind.tamanho_caminho; j++) {
       char mov = obter_movimento_valido(lab, atual);
       Stack_push(ind.caminho, mov);
-      // Atualiza posição apenas para movimentos válidos
+            
       switch(mov) {
-        case 'C': atual.i--; break;
-        case 'B': atual.i++; break;
-        case 'E': atual.j--; break;
-        case 'D': atual.j++; break;
+        case 'C': if(atual.i > 0) atual.i--; break;
+        case 'B': if(atual.i < lab->n-1) atual.i++; break;
+        case 'E': if(atual.j > 0) atual.j--; break;
+        case 'D': if(atual.j < lab->m-1) atual.j++; break;
       }
     }
-  } 
-  else if (tipo == ALEATORIO) {
-    for (int j = 0; j < ind.tamanho_caminho; j++) {
-      char mov = gerar_movimento_aleatorio();
-      Stack_push(ind.caminho, mov);
+  } else {// Modo ALEATORIO: gera movimentos aleatórios
+      for (int j = 0; j < ind.tamanho_caminho; j++) {
+        char movimentos[4] = {'C', 'B', 'E', 'D'};
+        char aleat = movimentos[rand() % 4];
+        Stack_push(ind.caminho, aleat);
+      }
     }
-  }
-
-  calcular_fitness(lab, &ind, distancia);
-  return ind;
+    
+    // CALCULAR FITNESS PARA AMBOS OS TIPOS
+    calcular_fitness(lab, &ind, distancia);
+    return ind;
 }
 
 TLinkedList *criar_populacao(Labirinto *lab, uint tamanho_populacao, FormaCaminho tipo, int distancia) {
@@ -150,36 +155,6 @@ TLinkedList *criar_populacao(Labirinto *lab, uint tamanho_populacao, FormaCaminh
   return populacao;
 }
 
-// Função unificada para exibição de simulação
-void exibir_simulacao_individuo(const Labirinto *lab, Individuo *indiv, int contador) {
-  int colisoes = 0;
-  char **lab_copia = copiar_matriz(lab->labirinto, lab->n, lab->m);
-  Posicao final = simular_movimentos(lab, indiv, &colisoes, lab_copia);
-
-  printf("Individuo %03d\n", contador);
-  printf("Posicao final: (%u, %u)\n", final.i, final.j);
-  printf("Fitness: %d\n", indiv->fitness);
-  printf("Status: ");
-
-  if (final.i == lab->saida.i && final.j == lab->saida.j) {
-    printf("Sucesso (atingiu o destino)\n");
-  } else {
-    printf("Falha (distancia: %d)\n", calcular_distancia_manhattan(final, lab->saida));
-  }
-
-  printf("Labirinto com caminho percorrido:\n");
-  for (uint i = 0; i < lab->n; i++) {
-    for (uint j = 0; j < lab->m; j++) {
-      printf("%c", lab_copia[i][j]);
-    }
-    printf("\n");
-  }
-  printf("\n");
-
-  for (uint i = 0; i < lab->n; i++) free(lab_copia[i]);
-  free(lab_copia);
-}
-
 void simular_populacao(const Labirinto *lab, TLinkedList *populacao) {
   if (!lab || !populacao) return;
 
@@ -190,7 +165,7 @@ void simular_populacao(const Labirinto *lab, TLinkedList *populacao) {
 
   TNo *atual = populacao->inicio;
   for (int contador = 1; atual != NULL; contador++, atual = atual->prox) {
-    exibir_simulacao_individuo(lab, &atual->info, contador);
+    imprimir_individuo(lab, &atual->info, contador);
   }
 }
 
@@ -336,7 +311,7 @@ Individuo* condicao_parada(const Labirinto *lab, TLinkedList *populacao) {
   return NULL;
 }
 
-void imprimir_individuo(Labirinto* lab, Individuo* indiv, int geracao, int w_distancia) {
+void imprimir_individuo(const Labirinto* lab, Individuo* indiv, int geracao) {
   char** lab_copia = copiar_matriz(lab->labirinto, lab->n, lab->m);
   int colisoes = 0;
   Posicao final = simular_movimentos(lab, indiv, &colisoes, lab_copia);

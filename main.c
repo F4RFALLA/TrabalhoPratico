@@ -1,4 +1,3 @@
-// main.c
 #include "individuo.h"
 #include "config.h"
 #include "populacao.h"
@@ -70,7 +69,7 @@ int main() {
     printf("Taxa de Elitismo: %.2f\n", config.elitismo);
     printf("Maximo de Geracoes: %d\n\n", config.max_gen);
     
-    while (geracao < config.max_gen && solucao_encontrada == NULL) {
+    while (geracao < config.max_gen && !solucao_encontrada) {
         printf("\n=== Geracao %d ===\n", geracao + 1);
         
         // 6.1 Selecionar elite
@@ -97,8 +96,7 @@ int main() {
         if (nova_geracao->inicio) {
             Individuo* melhor = &nova_geracao->inicio->info;
             printf("\nMelhor individuo da geracao %d:\n", geracao + 1);
-            printf("Fitness: %d\n", melhor->fitness);
-            printf("Tamanho do caminho: %d\n", melhor->tamanho_caminho);
+            imprimir_individuo(lab, melhor, geracao + 1);
         }
 
         // 6.6 Liberar memória das estruturas antigas
@@ -109,40 +107,42 @@ int main() {
         populacao = nova_geracao;
         
         // 6.8 Verificar condição de parada
-       solucao_encontrada = condicao_parada(lab, populacao);
+        solucao_encontrada = condicao_parada(lab, populacao);
         
         // 6.9 Exibir estatísticas
+        printf("\nEstatisticas da geracao %d:\n", geracao + 1);
         printf("Melhor fitness: %d\n", populacao->inicio->info.fitness);
         printf("Media de fitness: %.2f\n", (float)somar_fitness(populacao) / config.tamanho_populacao);
         
         geracao++;
-
-        if (solucao_encontrada) {
-            printf("\nMelhor solucao encontrada:\n");
-            printf("Fitness: %d\n", solucao_encontrada->fitness);
-            printf("Tamanho do caminho: %d\n", solucao_encontrada->tamanho_caminho);
-            
-            // Mostrar caminho percorrido
-            char** lab_copia = copiar_matriz(lab->labirinto, lab->n, lab->m);
-            int colisoes = 0;
-            simular_movimentos(lab, solucao_encontrada, &colisoes, lab_copia);
-            
-            printf("\nLabirinto com solucao:\n");
-            for (uint i = 0; i < lab->n; i++) {
-                for (uint j = 0; j < lab->m; j++) {
-                    printf("%c", lab_copia[i][j]);
-                }
-                printf("\n");
-            }
-            
-            // Liberar cópia do labirinto
-            for (uint i = 0; i < lab->n; i++) free(lab_copia[i]);
-            free(lab_copia);
-        }
-        else {
-            printf("\nNao foi encontrada solucao apos %d geracoes\n", geracao);
-        }
     }
+
+    // 7. Verificação final da solução
+    if (solucao_encontrada) {
+        printf("\n*** SOLUCAO ENCONTRADA NA GERACAO %d ***\n", geracao);
+        printf("Fitness: %d\n", solucao_encontrada->fitness);
+        printf("Tamanho do caminho: %d\n", solucao_encontrada->tamanho_caminho);
+        
+        // Mostrar caminho percorrido
+        char** lab_copia = copiar_matriz(lab->labirinto, lab->n, lab->m);
+        int colisoes = 0;
+        simular_movimentos(lab, solucao_encontrada, &colisoes, lab_copia);
+        
+        printf("\nLabirinto com solucao:\n");
+        for (uint i = 0; i < lab->n; i++) {
+            for (uint j = 0; j < lab->m; j++) {
+                printf("%c", lab_copia[i][j]);
+            }
+            printf("\n");
+        }
+        
+        // Liberar cópia do labirinto
+        for (uint i = 0; i < lab->n; i++) free(lab_copia[i]);
+        free(lab_copia);
+    } else {
+        printf("\nNao foi encontrada solucao apos %d geracoes\n", geracao);
+    }
+
     // 8. Liberação de recursos
     list_destroy(populacao, 1);
     liberar_matriz(labirinto, n);
