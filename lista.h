@@ -55,6 +55,13 @@ bool list_insert_begin(TLinkedList*, Individuo);
 bool list_insert_end(TLinkedList*, Individuo);
 
 /**
+ * Retorna o tamanho da lista (número de elementos)
+ * @param TLinkedList* lista
+ * @return int número de elementos
+ */
+int list_size(TLinkedList*);
+
+/**
  * Insere um elemento em ordem decrescente na lista.
  * Por exemplo, inserindo 1, 2, 3 resulta em [3] -> [2] -> [1].
  * @param TLinkedList* ponteiro para a lista
@@ -62,6 +69,13 @@ bool list_insert_end(TLinkedList*, Individuo);
  * @return bool true se a inserção foi bem-sucedida
  */
 bool list_insert_sorted(TLinkedList*, Individuo);
+
+/**
+ * destroi a lista
+ * @param TLinkedList* ponteiro para a lista
+ * @param int 1 se for liberar dados, 0 se não
+ */
+void list_destroy(TLinkedList* lista, int liberar_dados);
 
 /**
  * Imprime todos os elementos da lista no console.

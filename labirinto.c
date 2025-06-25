@@ -106,3 +106,21 @@ int labirinto_print(const Labirinto* lab){ //const indica que o ponteiro lab apo
 
     return 0;
 }
+
+char **copiar_matriz(char **original, uint n, uint m) {
+  char **copia = malloc(n * sizeof(char *));
+  if (!copia) return NULL;
+  
+  for (uint i = 0; i < n; i++) {
+    copia[i] = malloc(m * sizeof(char));
+    if (!copia[i]) {
+      for (uint j = 0; j < i; j++) free(copia[j]);
+      free(copia);
+      return NULL;
+    }
+    for (uint j = 0; j < m; j++) {
+      copia[i][j] = original[i][j];
+    }
+  }
+  return copia;
+}

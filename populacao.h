@@ -8,43 +8,94 @@
 
 /**
  * Cria uma população inicial de indivíduos com caminhos aleatórios.
- * Por exemplo, gera uma população com tamanho baseado na distância de Manhattan.
- * @param Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
- * @param uint - tamanho da população dado pelo usuário
- * @param FormaCaminho - tipo de movimento: aleatório ou somente válido
- * @param int - valor da penalidade da distancia
- * @return TLinkedList* - lista encadeada contendo a população ou NULL em caso de erro
- * @see calcular_distancia_manhattan(), TSList_create(), list_create()
+ * @param Labirinto* ponteiro para o labirinto
+ * @param uint tamanho da população
+ * @param FormaCaminho tipo de geração de caminho
+ * @param int peso da distância
+ * @return TLinkedList* lista da população
  */
 TLinkedList* criar_populacao(Labirinto*, uint, FormaCaminho, int);
 
 /**
  * Libera toda a memória alocada para uma população.
- * Por exemplo, libera todos os indivíduos e seus caminhos.
  * @param TLinkedList* ponteiro para a lista de população
  */
 void liberar_populacao(TLinkedList*);
 
 /**
- * Imprime toda a população no console, mostrando cada indivíduo com seu caminho e fitness.
- * Por exemplo, imprime "Indivíduo 1: Caminho: [C, B, E], Fitness: 10".
+ * Imprime toda a população no console.
  * @param TLinkedList* ponteiro para a lista de população
  */
 void print_populacao(TLinkedList*);
 
 /**
  * Simula e avalia toda a população.
- * Calcula fitness e posições finais para todos os indivíduos.
- * 
- * @param Labirinto* Ponteiro para o contexto do labirinto já inicializado, contendo:
- *- labirinto: matriz do labirinto
- *- n, m: dimensões
- *- inicio: posição inicial (S)
- *- saida: posição destino (E)
- *- penalidade: valor da penalidade por colisão
- * @param TLinkedList Lista encadeada contendo a população a ser avaliada
+ * @param const Labirinto* ponteiro para o labirinto
+ * @param TLinkedList* lista da população
  */
 void simular_populacao(const Labirinto*, TLinkedList*);
 
+/**
+ * Calcula o somatório de fitness da população.
+ * @param TLinkedList* ponteiro para a lista de população
+ * @return int soma total dos fitness
+ */
+int somar_fitness(TLinkedList*);
+
+/**
+ * Sorteia um valor para roleta viciada.
+ * @param TLinkedList* ponteiro para a lista de população
+ * @return int valor sorteado
+ */
+int sortear_valor_roleta(TLinkedList*);
+
+/**
+ * Seleciona um pai usando roleta viciada.
+ * @param TLinkedList* ponteiro para a lista de população
+ * @return int índice do pai selecionado
+ */
+int selecionar_pai(TLinkedList*);
+
+/**
+ * Seleciona os melhores indivíduos (elitismo).
+ * @param TLinkedList* ponteiro para a população
+ * @param float taxa de elitismo
+ * @return TLinkedList* lista com elite
+ */
+TLinkedList* elitismo(TLinkedList*, float);
+
+/**
+ * Clona um indivíduo.
+ * @param const Individuo* indivíduo a ser clonado
+ * @return Individuo cópia do indivíduo
+ */
+Individuo clonar_individuo(const Individuo*);
+
+/**
+ * Realiza crossover entre duas populações.
+ * @param TLinkedList* população elite
+ * @param TLinkedList* população total
+ * @param Labirinto* ponteiro para labirinto
+ * @param int peso da distância
+ * @return TLinkedList* nova geração
+ */
+TLinkedList* crossover(TLinkedList*, TLinkedList*, Labirinto*, int);
+
+/**
+ * Verifica condição de parada (chegada na saída).
+ * @param const Labirinto* ponteiro para labirinto
+ * @param TLinkedList* lista da população
+ * @return int 1 se condição satisfeita, 0 caso contrário
+ */
+int condicao_parada(const Labirinto*, TLinkedList*);
+
+/**
+ * Imprime detalhes de um indivíduo.
+ * @param Labirinto* ponteiro para labirinto
+ * @param Individuo* ponteiro para indivíduo
+ * @param int geração atual
+ * @param int peso da distância
+ */
+void imprimir_individuo(Labirinto*, Individuo*, int, int);
 
 #endif

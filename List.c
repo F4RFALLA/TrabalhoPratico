@@ -60,6 +60,22 @@ bool list_insert_end(TLinkedList* lista, Individuo info) {
     return true;
 }
 
+void list_destroy(TLinkedList* lista, int liberar_dados) {
+    if (!lista) return;
+    
+    TNo* atual = lista->inicio;
+    while (atual) {
+        TNo* proximo = atual->prox;
+        if (liberar_dados && atual->info.caminho) {
+            free(atual->info.caminho->data);
+            free(atual->info.caminho);
+        }
+        free(atual);
+        atual = proximo;
+    }
+    free(lista);
+}
+
 void list_print(TLinkedList* lista){
     if(!lista) return;
     
@@ -104,6 +120,17 @@ bool list_delete_begin(TLinkedList* lista){
     lista->inicio = lista->inicio->prox;
     free(aux);
     return true;
+}
+
+int list_size(TLinkedList* lista) {
+    if (!lista) return 0;
+    int count = 0;
+    TNo* aux = lista->inicio;
+    while (aux) {
+        count++;
+        aux = aux->prox;
+    }
+    return count;
 }
 
 // Implementação correta da pilha

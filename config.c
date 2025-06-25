@@ -38,7 +38,7 @@ Config ler_config(const char* filename) {
         } else if (strstr(line, "forma_caminho:")) {
             if (strstr(line, "mov_validos")) {
                 cfg.forma_caminho = MOV_VALIDOS;
-            } else if (strstr(line, "aleat")) {
+            } else if (strstr(line, "aleatorio")) {
                 cfg.forma_caminho = ALEATORIO;
             }
         }

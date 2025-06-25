@@ -73,4 +73,6 @@ bool encontrar_posicoes_SE(Labirinto*, Posicao*, Posicao*);
  */
 Labirinto* criar_contexto(char**, uint, uint, int);
 
+char **copiar_matriz(char **, uint , uint);
+
 #endif
